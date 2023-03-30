@@ -99,7 +99,7 @@ class HSC103Controller:
         self.send(order)
         msg = self.recv()
         try:
-            pos_list = list(map(int, msg.split(',')))
+            pos_list = list(map(lambda x: int(x) * self.um_per_pulse, msg.split(',')))
         except ValueError:
             pos_list = [0, 0, 0]
         return pos_list
@@ -117,7 +117,7 @@ class HSC103Controller:
             print('stop list must contain [axis1(0 or 1), axis2(0 or 1), axis3(0 or 1)]')
             return False
 
-        order = 'K:' + ','.join([str(int(val / self.um_per_pulse)) for val in [1, 2, 3] + coord])
+        order = 'K:1,2,3,' + ','.join([str(int(val / self.um_per_pulse)) for val in coord])
         self.send(order)
 
     def jog(self, args: list):
