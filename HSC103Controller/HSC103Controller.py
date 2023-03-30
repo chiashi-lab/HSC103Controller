@@ -85,7 +85,7 @@ class HSC103Controller:
                 print(msg, self.recv())
 
     def is_busy(self):
-        order = 'Q:'
+        order = '!:'
         self.send(order)
         msg = self.recv()
         try:
