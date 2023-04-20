@@ -101,6 +101,7 @@ class HSC103Controller:
         try:
             pos_list = list(map(lambda x: int(x) * self.um_per_pulse, msg.split(',')))
         except ValueError:
+            print(msg)
             pos_list = [0, 0, 0]
         return pos_list
 
