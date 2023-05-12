@@ -1,50 +1,6 @@
 import serial
 
 
-class MySerial(serial.Serial):
-    # serial.SerialではEOLが\nに設定されており、DS102の規格と異なる
-    eol = b'\r'
-    leneol = len(eol)
-
-    def __init__(self, port, baudrate, **args):
-        super().__init__(port, baudrate, **args)
-
-    def send(self, msg: str):
-        msg = msg.encode() + self.eol
-        self.write(msg)
-
-    def recv(self):
-        line = bytearray()
-        while True:
-            c = self.read(1)
-            if c:
-                line += c
-                if line[-self.leneol:] == self.eol:
-                    break
-            else:
-                break
-        return bytes(line).decode().strip('\r')
-
-
-def axis2msg(axis: str):
-    """
-    convert axis to 'AXIs<axis>:'
-    :param axis: 'x' or 'y'
-    :type axis: str
-    :rtype: str
-    :return: message string
-    """
-    if axis not in ['x', 'y']:
-        raise ValueError('Axis must be x or y.')
-    msg = 'AXIs'
-    if axis == 'x':
-        msg += '1'
-    elif axis == 'y':
-        msg += '2'
-    msg += ':'
-    return msg
-
-
 class HSC103Controller:
     def __init__(self, ser=None):
         self.ser = ser
@@ -84,26 +40,9 @@ class HSC103Controller:
                 self.send(msg)
                 print(msg, self.recv())
 
-    def is_busy(self):
-        order = '!:'
-        self.send(order)
-        msg = self.recv()
-        try:
-            busy_list = list(map(int, msg.split(',')))  # 1: busy, 0: ready
-        except ValueError:
-            busy_list = [-1, -1, -1]
-        return busy_list
-
     def get_position(self):
         order = 'Q:'
         self.send(order)
-        msg = self.recv()
-        try:
-            pos_list = list(map(lambda x: int(x) * self.um_per_pulse, msg.split(',')))
-        except ValueError:
-            print(msg)
-            pos_list = [0, 0, 0]
-        return pos_list
 
     def move_abs(self, values: list):
         if len(values) != 3:
