@@ -9,8 +9,6 @@ class HSC103Controller:
         self.um_per_pulse = 0.01
         self.max_speed = 4000000 * self.um_per_pulse  # [um]
 
-        self.check_status()
-
     def send(self, order: str):
         if self.ser is None:
             return
